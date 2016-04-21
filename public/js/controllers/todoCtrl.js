@@ -9,6 +9,7 @@ angular.module( "todomvc" )
 	.controller( "TodoCtrl", function TodoCtrl( $scope, $routeParams, $filter, todos ) {
 		"use strict";
 
+		$scope.todos      = todos.entityCache;
 		$scope.newTodo    = "";
 		$scope.editedTodo = null;
 

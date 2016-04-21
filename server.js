@@ -13,7 +13,7 @@ app.use( express.static( "public" ) );
 const api = new express.Router();
 api.use( bodyParser.json() );
 
-const todos = new Map();
+const todos = [];
 
 // API Routes.
 api.get( "/", ( request, response ) => {
@@ -33,8 +33,9 @@ api.get( "/todos/:id", ( request, response ) => {
 } );
 
 api.post( "/todos", ( request, response ) => {
-	const id = uuid.v4();
-	todos.set( id, request.body );
+	const id        = uuid.v4();
+	request.body.id = id;
+	todos.push( request.body );
 	response.status( 201 ).send( {
 		todo : {
 			id : id

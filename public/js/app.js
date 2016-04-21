@@ -9,12 +9,7 @@ angular.module( "todomvc", [ "absync", "ngRoute", "ngResource" ] )
 	.config( function( $routeProvider ) {
 		var routeConfig = {
 			controller  : "TodoCtrl",
-			templateUrl : "todomvc-index.html",
-			resolve     : {
-				store : function( todoStorage ) {
-					return todoStorage;
-				}
-			}
+			templateUrl : "todomvc-index.html"
 		};
 
 		$routeProvider
