@@ -2,7 +2,8 @@
 
 angular
 	.module( "todomvc" )
-	.config( registerTodoService );
+	.config( registerTodoService )
+	.run( configureService );
 
 /* @ngInject */
 function registerTodoService( absyncProvider ) {
@@ -12,7 +13,16 @@ function registerTodoService( absyncProvider ) {
 			collectionName : "todos",
 			collectionUri  : "/api/todos",
 			entityName     : "todo",
-			entityUri      : "/api/todo"
+			entityUri      : "/api/todos"
 		}
 	);
+}
+
+/* @ngInjec */
+function configureService( $http, todos ) {
+	todos.throwFailures = true;
+
+	todos.clearCompleted = function() {
+		return $http.delete( "/api/todos" );
+	}
 }

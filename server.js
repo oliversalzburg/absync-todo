@@ -2,10 +2,15 @@
 
 const _          = require( "lodash" );
 const bodyParser = require( "body-parser" );
+const http       = require( "http" );
 const express    = require( "express" );
+const socketIo   = require( "socket.io" );
 const uuid       = require( "node-uuid" );
 
-const app = express();
+const app    = express();
+const server = http.Server( app );
+const io     = socketIo( server );
+
 // Serve our front-end application
 app.use( express.static( "public" ) );
 
@@ -13,7 +18,7 @@ app.use( express.static( "public" ) );
 const api = new express.Router();
 api.use( bodyParser.json() );
 
-const todos = [];
+let todos = [];
 
 // API Routes.
 api.get( "/", ( request, response ) => {
@@ -29,46 +34,103 @@ api.get( "/todos", ( request, response ) => {
 } );
 
 api.get( "/todos/:id", ( request, response ) => {
-	todos.get( request.param( "id" ), _handleApiResponse( response ) );
-} );
+	const todo = _.find( todos, {
+		id : request.params.id
+	} );
 
-api.post( "/todos", ( request, response ) => {
-	const id        = uuid.v4();
-	request.body.id = id;
-	todos.push( request.body );
-	response.status( 201 ).send( {
-		todo : {
-			id : id
-		}
+	if( !todo ) {
+		return response.sendStatus( 404 );
+	}
+
+	response.sendStatus( 200 ).send( {
+		todo : todo
 	} );
 } );
 
+api.post( "/todos", ( request, response ) => {
+	const todo = request.body.todo;
+	todo.id    = uuid.v4();
+	todos.push( todo );
+	response.status( 201 ).send( {
+		todo : {
+			id : todo.id
+		}
+	} );
+
+	io.emit( "todo", {
+		todo : todo
+	} );
+
+	console.log( `New todo ${todo.id}` );
+} );
+
 api.put( "/todos/:id", ( request, response ) => {
-	todos.update( request.param( "id" ), request.body, _handleApiResponse( response ) );
+	let todoIndex = _.findIndex( todos, {
+		id : request.params.id
+	} );
+
+	if( !request.body.todo ) {
+		return response.sendStatus( 400 );
+	}
+
+	if( todoIndex < 0 ) {
+		return response.sendStatus( 404 );
+	}
+
+	todos[ todoIndex ] = request.body.todo;
+	const todo         = todos[ todoIndex ];
+
+	response.status( 200 ).send( {
+		todo : todo
+	} );
+
+	io.emit( "todo", {
+		todo : todo
+	} );
+
+	console.log( `Updated todo ${todo.id}` );
 } );
 
 api.delete( "/todos", ( request, response ) => {
-	todos.deleteCompleted( _handleApiResponse( response, 204 ) );
+	const completed = _.filter( todos, {
+		completed : true
+	} );
+
+	if( !completed || !completed.length ) {
+		return response.sendStatus( 404 );
+	}
+
+	todos = _.reject( todos, {
+		completed : true
+	} );
+
+	io.emit( "todos", {
+		todos : todos
+	} );
+
+	response.status( 200 );
 } );
 
 api.delete( "/todos/:id", ( request, response ) => {
-	todos.delete( request.param( "id" ), _handleApiResponse( response, 204 ) );
-} );
+	const todo = _.find( todos, {
+		id : request.params.id
+	} );
 
-function _handleApiResponse( response, successStatus ) {
-	return function( err, payload ) {
-		if( err ) {
-			console.error( err );
-			response.status( err.code ).send( err.message );
-			return;
+	if( !todo ) {
+		return response.sendStatus( 404 );
+	}
+
+	io.emit( "todo", {
+		todo : {
+			id : todo.id
 		}
-		if( successStatus ) {
-			response.status( successStatus );
-		}
-		response.json( payload );
-	};
-}
+	} );
+
+	todos = _.without( todos, todo );
+
+	console.log( `Deleted todo ${todo.id}` );
+} );
 
 // Include the API and start listening for requestuests
 app.use( "/api", api );
-app.listen( 3000 );
+server.listen( 3000 );

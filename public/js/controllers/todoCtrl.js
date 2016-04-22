@@ -1,4 +1,5 @@
-/*global angular */
+"use strict";
+/* global angular */
 
 /**
  * The main controller for the app. The controller:
@@ -7,17 +8,21 @@
  */
 angular.module( "todomvc" )
 	.controller( "TodoCtrl", function TodoCtrl( $scope, $routeParams, $filter, todos ) {
-		"use strict";
-
 		$scope.todos      = todos.entityCache;
 		$scope.newTodo    = "";
 		$scope.editedTodo = null;
+
+		// No idea why we need to invoke a digest cycle manually.
+		// This is something we need to look into.
+		$scope.$root.$on( "entityNew", angular.bind( $scope, $scope.$apply ) );
+		$scope.$root.$on( "entityUpdated", angular.bind( $scope, $scope.$apply ) );
+		$scope.$root.$on( "entityRemoved", angular.bind( $scope, $scope.$apply ) );
 
 		$scope.$watch( "todos", function() {
 			$scope.remainingCount = $filter( "filter" )( todos.entityCache, {
 				completed : false
 			} ).length;
-			$scope.completedCount = todos.length - $scope.remainingCount;
+			$scope.completedCount = todos.entityCache.length - $scope.remainingCount;
 			$scope.allChecked     = !$scope.remainingCount;
 		}, true );
 
@@ -82,10 +87,15 @@ angular.module( "todomvc" )
 				return;
 			}
 
-			todoStorage[ todo.title ? "put" : "delete" ]( todo )
-				.then( function success() {}, function error() {
-					todo.title = $scope.originalTodo.title;
-				} )
+			var editPromise;
+
+			if( !todo.title ) {
+				editPromise = todos.delete( todo )
+			} else {
+				editPromise = todos.update( todo );
+			}
+
+			return editPromise
 				.finally( function() {
 					$scope.editedTodo = null;
 				} );
@@ -99,29 +109,26 @@ angular.module( "todomvc" )
 		};
 
 		$scope.removeTodo = function( todo ) {
-			todoStorage.delete( todo );
+			todos.delete( todo );
 		};
 
 		$scope.saveTodo = function( todo ) {
-			todoStorage.put( todo );
+			todos.update( todo );
 		};
 
 		$scope.toggleCompleted = function( todo, completed ) {
 			if( angular.isDefined( completed ) ) {
 				todo.completed = completed;
 			}
-			todoStorage.put( todo, todos.indexOf( todo ) )
-				.then( function success() {}, function error() {
-					todo.completed = !todo.completed;
-				} );
+			todos.update( todo );
 		};
 
 		$scope.clearCompletedTodos = function() {
-			todoStorage.clearCompleted();
+			todos.clearCompleted();
 		};
 
 		$scope.markAll = function( completed ) {
-			todos.forEach( function( todo ) {
+			todos.entityCache.forEach( function( todo ) {
 				if( todo.completed !== completed ) {
 					$scope.toggleCompleted( todo, completed );
 				}

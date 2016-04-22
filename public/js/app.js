@@ -6,10 +6,15 @@
  * @type {angular.Module}
  */
 angular.module( "todomvc", [ "absync", "ngRoute", "ngResource" ] )
-	.config( function( $routeProvider ) {
+	.config( function( $routeProvider, absyncProvider ) {
 		var routeConfig = {
 			controller  : "TodoCtrl",
-			templateUrl : "todomvc-index.html"
+			templateUrl : "todomvc-index.html",
+			resolve     : {
+				todoItems : function( todos ) {
+					return todos.ensureLoaded();
+				}
+			}
 		};
 
 		$routeProvider
@@ -18,4 +23,7 @@ angular.module( "todomvc", [ "absync", "ngRoute", "ngResource" ] )
 			.otherwise( {
 				redirectTo : "/"
 			} );
+
+		var ioSocket = io();
+		absyncProvider.configure( ioSocket, true );
 	} );
