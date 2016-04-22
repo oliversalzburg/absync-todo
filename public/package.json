@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "scripts": {
+    "test": "karma start test/config/karma.conf.js"
+  },
+  "dependencies": {
+    "absync": "^2.7.3",
+    "angular": "~1.4.3",
+    "angular-resource": "~1.4.3",
+    "angular-route": "~1.4.3",
+    "socket.io": "1.4.5",
+    "todomvc-app-css": "^1.0.1",
+    "todomvc-common": "^1.0.0"
+  }
+}

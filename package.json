@@ -1,0 +1,33 @@
+{
+  "name": "absync-todo",
+  "version": "1.0.0",
+  "description": "TodoMVC with absync",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oliversalzburg/absync-todo.git"
+  },
+  "keywords": [
+    "absync",
+    "todomvc"
+  ],
+  "author": "Oliver Salzburg <oliver.salzburg@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oliversalzburg/absync-todo/issues"
+  },
+  "homepage": "https://github.com/oliversalzburg/absync-todo#readme",
+  "devDependencies": {
+    "jscs": "3.0.3"
+  },
+  "dependencies": {
+    "body-parser": "1.15.0",
+    "express": "4.13.4",
+    "lodash": "4.11.1",
+    "node-uuid": "1.4.7",
+    "socket.io": "^1.4.5"
+  }
+}
