@@ -90,7 +90,7 @@ angular.module( "todomvc" )
 			var editPromise;
 
 			if( !todo.title ) {
-				editPromise = todos.delete( todo )
+				editPromise = todos.delete( todo );
 			} else {
 				editPromise = todos.update( todo );
 			}
