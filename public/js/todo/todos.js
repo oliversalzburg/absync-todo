@@ -1,3 +1,4 @@
+/*
 "use strict";
 
 angular
@@ -5,7 +6,11 @@ angular
 	.config( registerTodoService )
 	.run( configureService );
 
-/* @ngInject */
+/!**
+ * This showcases how to register an absync service which will can be injected.
+ *!/
+
+/!* @ngInject *!/
 function registerTodoService( absyncProvider ) {
 	absyncProvider.collection( "todos",
 		{
@@ -13,16 +18,18 @@ function registerTodoService( absyncProvider ) {
 			collectionName : "todos",
 			collectionUri  : "/api/todos",
 			entityName     : "todo",
-			entityUri      : "/api/todos"
+			entityUri      : "/api/todos",
+			debug          : true
 		}
 	);
 }
 
-/* @ngInjec */
+/!* @ngInject *!/
 function configureService( $http, todos ) {
 	todos.throwFailures = true;
 
 	todos.clearCompleted = function() {
 		return $http.delete( "/api/todos" );
-	}
+	};
 }
+*/

@@ -132,5 +132,6 @@ api.delete( "/todos/:id", ( request, response ) => {
 } );
 
 // Include the API and start listening for requestuests
+console.log( "Server running on http://localhost:3000" );
 app.use( "/api", api );
 server.listen( 3000 );

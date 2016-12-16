@@ -8,7 +8,6 @@
     "angular": "~1.4.3",
     "angular-resource": "~1.4.3",
     "angular-route": "~1.4.3",
-    "socket.io": "1.4.5",
     "socket.io-client": "^1.4.5",
     "todomvc-app-css": "^1.0.1",
     "todomvc-common": "^1.0.0"

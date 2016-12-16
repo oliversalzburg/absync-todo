@@ -7,8 +7,25 @@
  * - exposes the model to the template and provides event handlers
  */
 angular.module( "todomvc" )
-	.controller( "TodoCtrl", function TodoCtrl( $scope, $routeParams, $filter, todos ) {
-		$scope.todos      = todos.entityCache;
+	.controller( "TodoCtrl", function TodoCtrl( $log, $routeParams, $scope, $filter, absync ) {
+		var todos = absync.sync( "todosInstant", {
+			model          : "Todo",
+			collectionName : "todos",
+			collectionUri  : "/api/todos",
+			entityName     : "todo",
+			entityUri      : "/api/todos",
+			debug          : true
+		} );
+
+		$log.info( "Loading todo data…" );
+		todos.ensureLoaded()
+			.then( function onLoaded() {
+				$scope.$apply( function() {
+					$scope.todos = todos.entityCache;
+					$log.info( "Todo data has been added to scope." );
+				} );
+			} );
+
 		$scope.newTodo    = "";
 		$scope.editedTodo = null;
 
@@ -16,7 +33,9 @@ angular.module( "todomvc" )
 		// This is something we need to look into.
 		$scope.$root.$on( "entityNew", angular.bind( $scope, $scope.$apply ) );
 		$scope.$root.$on( "entityUpdated", angular.bind( $scope, $scope.$apply ) );
-		$scope.$root.$on( "entityRemoved", angular.bind( $scope, $scope.$apply ) );
+		$scope.$root.$on( "entityRemoved", () => {
+			debugger;
+		} );
 
 		$scope.$watch( "todos", function() {
 			$scope.remainingCount = $filter( "filter" )( todos.entityCache, {
