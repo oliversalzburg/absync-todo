@@ -68,12 +68,13 @@ angular.module( "todomvc" )
 			}
 
 			$scope.saving = true;
-			todos.create( newTodo )
+			return todos.create( newTodo )
 				.then( function success() {
 					$scope.newTodo = "";
 				} )
 				.finally( function() {
 					$scope.saving = false;
+					$scope.$apply();
 				} );
 		};
 
